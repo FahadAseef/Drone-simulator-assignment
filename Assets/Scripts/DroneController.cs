@@ -8,14 +8,16 @@ public class DroneController : MonoBehaviour
     public float verticalSpeed = 5f;
     public float rotationSpeed = 100f;
 
+    [Header("Joystick")]
+    public Joystick moveJoystick;     // Left joystick = movement
+    public Joystick rotateJoystick;   // Right joystick = rotate + up/down
+
     private Rigidbody rb;
 
     private float moveX;
     private float moveZ;
     private float moveY;
     private float yaw;
-
-    //public Transform droneBody;
 
     void Start()
     {
@@ -25,31 +27,62 @@ public class DroneController : MonoBehaviour
 
     void Update()
     {
-        // Horizontal movement input
-        moveX = Input.GetAxis("Horizontal");
-        moveZ = Input.GetAxis("Vertical"); 
+        // =========================
+        // KEYBOARD INPUT
+        // =========================
+        float keyboardX = Input.GetAxis("Horizontal"); // A / D
+        float keyboardZ = Input.GetAxis("Vertical");   // W / S
 
-        // Vertical movement input
-        moveY = 0f;
-        if (Input.GetKey(KeyCode.Q)) moveY = 1f;   
-        if (Input.GetKey(KeyCode.E)) moveY = -1f; 
+        float keyboardYaw = 0f;
+        if (Input.GetKey(KeyCode.LeftArrow)) keyboardYaw = -1f;
+        if (Input.GetKey(KeyCode.RightArrow)) keyboardYaw = 1f;
 
-        // Rotation input
-        yaw = 0f;
-        if (Input.GetKey(KeyCode.LeftArrow)) yaw = -1f;
-        if (Input.GetKey(KeyCode.RightArrow)) yaw = 1f;
+        float keyboardY = 0f;
+        if (Input.GetKey(KeyCode.Q)) keyboardY = 1f;   // Up
+        if (Input.GetKey(KeyCode.E)) keyboardY = -1f;  // Down
+
+        // =========================
+        // JOYSTICK INPUT
+        // =========================
+        float joystickX = 0f;
+        float joystickZ = 0f;
+
+        float joystickYaw = 0f;
+        float joystickVertical = 0f;
+
+        if (moveJoystick != null)
+        {
+            joystickX = moveJoystick.Horizontal;
+            joystickZ = moveJoystick.Vertical;
+        }
+
+        if (rotateJoystick != null)
+        {
+            joystickYaw = rotateJoystick.Horizontal;   // Left / Right = rotate
+            joystickVertical = rotateJoystick.Vertical; // Up / Down = rise / fall
+        }
+
+        // =========================
+        // COMBINE INPUTS
+        // =========================
+        moveX = Mathf.Clamp(keyboardX + joystickX, -1f, 1f);
+        moveZ = Mathf.Clamp(keyboardZ + joystickZ, -1f, 1f);
+
+        yaw = Mathf.Clamp(keyboardYaw + joystickYaw, -1f, 1f);
+
+        // Q/E + Right joystick Up/Down
+        moveY = Mathf.Clamp(keyboardY + joystickVertical, -1f, 1f);
     }
 
     void FixedUpdate()
     {
         MoveDrone();
         RotateDrone();
-        //RotateBody();
     }
 
     void MoveDrone()
     {
-        Vector3 move = transform.forward * moveZ + transform.right * moveX;
+        Vector3 move = (transform.forward * moveZ + transform.right * moveX).normalized;
         Vector3 velocity = new Vector3(move.x * moveSpeed, moveY * verticalSpeed, move.z * moveSpeed);
         rb.linearVelocity = velocity;
     }
@@ -59,12 +92,4 @@ public class DroneController : MonoBehaviour
         Quaternion turnOffset = Quaternion.Euler(0f, yaw * rotationSpeed * Time.fixedDeltaTime, 0f);
         rb.MoveRotation(rb.rotation * turnOffset);
     }
-
-    //void RotateBody()
-    //{
-    //    if (droneBody == null) return;
-
-    //    droneBody.Rotate(0f, yaw * rotationSpeed * Time.fixedDeltaTime, 0f);
-    //}
-
 }

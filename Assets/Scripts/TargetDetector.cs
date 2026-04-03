@@ -32,8 +32,9 @@ public class TargetDetector : MonoBehaviour
     void Update()
     {
         DetectTarget();
-        HandleLockInput();
-        HandleFireInput();
+
+        // Optional keyboard support (keep if you want testing in editor)
+        HandleKeyboardInput();
     }
 
     void DetectTarget()
@@ -53,48 +54,72 @@ public class TargetDetector : MonoBehaviour
         currentTarget = null;
     }
 
-    void HandleLockInput()
+    void HandleKeyboardInput()
     {
         // Press F to lock target
         if (Input.GetKeyDown(KeyCode.F))
         {
-            if (currentTarget != null)
-            {
-                lockedTarget = currentTarget;
-                Debug.Log("LOCKED TARGET: " + lockedTarget.name);
-
-                // Change X rotation to 3
-                SetObjectXRotation(lockedXRotation);
-            }
+            LockTarget();
         }
 
         // Press R to unlock target
         if (Input.GetKeyDown(KeyCode.R))
         {
-            if (lockedTarget != null)
-            {
-                Debug.Log("UNLOCKED TARGET: " + lockedTarget.name);
-                lockedTarget = null;
-
-                // Change X rotation back to 10
-                SetObjectXRotation(normalXRotation);
-            }
+            ReleaseTarget();
         }
-    }
 
-    void HandleFireInput()
-    {
         // Press Space to fire missile
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (lockedTarget != null)
-            {
-                FireMissile();
-            }
-            else
-            {
-                Debug.Log("No locked target to fire at!");
-            }
+            LaunchMissile();
+        }
+    }
+
+    // =========================
+    // UI BUTTON FUNCTIONS
+    // =========================
+
+    public void LockTarget()
+    {
+        if (currentTarget != null)
+        {
+            lockedTarget = currentTarget;
+            Debug.Log("LOCKED TARGET: " + lockedTarget.name);
+
+            // Change X rotation to locked angle
+            SetObjectXRotation(lockedXRotation);
+        }
+        else
+        {
+            Debug.Log("No target in crosshair to lock!");
+        }
+    }
+
+    public void ReleaseTarget()
+    {
+        if (lockedTarget != null)
+        {
+            Debug.Log("UNLOCKED TARGET: " + lockedTarget.name);
+            lockedTarget = null;
+
+            // Change X rotation back to normal
+            SetObjectXRotation(normalXRotation);
+        }
+        else
+        {
+            Debug.Log("No locked target to release!");
+        }
+    }
+
+    public void LaunchMissile()
+    {
+        if (lockedTarget != null)
+        {
+            FireMissile();
+        }
+        else
+        {
+            Debug.Log("No locked target to fire at!");
         }
     }
 

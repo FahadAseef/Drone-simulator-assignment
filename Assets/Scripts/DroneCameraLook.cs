@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class DroneCameraLook : MonoBehaviour
 {
@@ -18,11 +19,11 @@ public class DroneCameraLook : MonoBehaviour
     private float pitch = 0f;
     private float yawOffset = 0f;
 
-    void Start()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-    }
+    //void Start()
+    //{
+    //    Cursor.lockState = CursorLockMode.Locked;
+    //    Cursor.visible = false;
+    //}
 
     void Update()
     {
@@ -38,17 +39,38 @@ public class DroneCameraLook : MonoBehaviour
 
     void HandleLook()
     {
+#if UNITY_EDITOR || UNITY_STANDALONE
+        // PC Controls (keep as it is)
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
-        // Left / Right camera pan
         yawOffset += mouseX;
-
-        // Up / Down camera tilt
         pitch -= mouseY;
+#else
+    // MOBILE TOUCH CONTROLS
+    if (Input.touchCount > 0)
+    {
+        Touch touch = Input.GetTouch(0);
+
+        if (EventSystem.current.IsPointerOverGameObject(touch.fingerId))
+        return;
+
+        // Only move camera when finger is moving
+        if (touch.phase == TouchPhase.Moved)
+        {
+            Vector2 delta = touch.deltaPosition;
+
+            float touchX = delta.x * mouseSensitivity * 0.02f * Time.deltaTime;
+            float touchY = delta.y * mouseSensitivity * 0.02f * Time.deltaTime;
+
+            yawOffset += touchX;
+            pitch -= touchY;
+        }
+    }
+#endif
+
         pitch = Mathf.Clamp(pitch, minTilt, maxTilt);
 
-        // Apply rotation to CameraPivot only
         cameraPivot.localRotation = Quaternion.Euler(pitch, yawOffset, 0f);
     }
 
