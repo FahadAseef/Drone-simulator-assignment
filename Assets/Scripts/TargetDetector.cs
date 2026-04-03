@@ -14,11 +14,19 @@ public class TargetDetector : MonoBehaviour
     public GameObject missilePrefab;
     public Transform missileSpawnPoint;
 
+    [Header("Rotation Change")]
+    public Transform objectToRotate; // Assign your GameObject here
+    public float normalXRotation = 10f;
+    public float lockedXRotation = 3f;
+
     private Camera cam;
 
     void Start()
     {
         cam = Camera.main;
+
+        // Set default rotation at start
+        SetObjectXRotation(normalXRotation);
     }
 
     void Update()
@@ -54,6 +62,9 @@ public class TargetDetector : MonoBehaviour
             {
                 lockedTarget = currentTarget;
                 Debug.Log("LOCKED TARGET: " + lockedTarget.name);
+
+                // Change X rotation to 3
+                SetObjectXRotation(lockedXRotation);
             }
         }
 
@@ -64,6 +75,9 @@ public class TargetDetector : MonoBehaviour
             {
                 Debug.Log("UNLOCKED TARGET: " + lockedTarget.name);
                 lockedTarget = null;
+
+                // Change X rotation back to 10
+                SetObjectXRotation(normalXRotation);
             }
         }
     }
@@ -92,6 +106,14 @@ public class TargetDetector : MonoBehaviour
         missileScript.target = lockedTarget;
 
         Debug.Log("MISSILE FIRED at: " + lockedTarget.name);
+    }
+
+    void SetObjectXRotation(float xValue)
+    {
+        if (objectToRotate == null) return;
+
+        Vector3 currentRot = objectToRotate.localEulerAngles;
+        objectToRotate.localEulerAngles = new Vector3(xValue, currentRot.y, currentRot.z);
     }
 
     void OnDrawGizmos()
