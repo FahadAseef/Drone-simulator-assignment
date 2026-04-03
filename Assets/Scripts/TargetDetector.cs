@@ -15,7 +15,7 @@ public class TargetDetector : MonoBehaviour
     public Transform missileSpawnPoint;
 
     [Header("Rotation Change")]
-    public Transform objectToRotate; // Assign your GameObject here
+    public Transform objectToRotate;
     public float normalXRotation = 10f;
     public float lockedXRotation = 3f;
 
@@ -25,7 +25,6 @@ public class TargetDetector : MonoBehaviour
     {
         cam = Camera.main;
 
-        // Set default rotation at start
         SetObjectXRotation(normalXRotation);
     }
 
@@ -33,7 +32,6 @@ public class TargetDetector : MonoBehaviour
     {
         DetectTarget();
 
-        // Optional keyboard support (keep if you want testing in editor)
         HandleKeyboardInput();
     }
 
@@ -56,28 +54,24 @@ public class TargetDetector : MonoBehaviour
 
     void HandleKeyboardInput()
     {
-        // Press F to lock target
         if (Input.GetKeyDown(KeyCode.F))
         {
             LockTarget();
         }
 
-        // Press R to unlock target
         if (Input.GetKeyDown(KeyCode.R))
         {
             ReleaseTarget();
         }
 
-        // Press Space to fire missile
         if (Input.GetKeyDown(KeyCode.Space))
         {
             LaunchMissile();
         }
     }
 
-    // =========================
+
     // UI BUTTON FUNCTIONS
-    // =========================
 
     public void LockTarget()
     {

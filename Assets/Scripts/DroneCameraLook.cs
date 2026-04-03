@@ -4,9 +4,9 @@ using UnityEngine.EventSystems;
 public class DroneCameraLook : MonoBehaviour
 {
     [Header("References")]
-    public Transform droneBody;              // Main Drone
-    public Transform cameraPivot;            // CameraPivot
-    public TargetDetector targetDetector;    // Drag TargetDetector here
+    public Transform droneBody;            
+    public Transform cameraPivot;        
+    public TargetDetector targetDetector;
 
     [Header("Look Settings")]
     public float mouseSensitivity = 100f;
@@ -16,8 +16,8 @@ public class DroneCameraLook : MonoBehaviour
     [Header("Lock Settings")]
     public Vector3 targetOffset = new Vector3(0f, 1.5f, 0f); // Aim at target center
 
-    private float pitch = 0f;
-    private float yawOffset = 0f;
+    private float lookUpDown = 0f;
+    private float rotateLeftRight = 0f;
 
     //void Start()
     //{
@@ -40,12 +40,12 @@ public class DroneCameraLook : MonoBehaviour
     void HandleLook()
     {
 #if UNITY_EDITOR || UNITY_STANDALONE
-        // PC Controls (keep as it is)
+        // PC Controls
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
-        yawOffset += mouseX;
-        pitch -= mouseY;
+        rotateLeftRight += mouseX;
+        lookUpDown -= mouseY;
 #else
     // MOBILE TOUCH CONTROLS
     if (Input.touchCount > 0)
@@ -63,15 +63,15 @@ public class DroneCameraLook : MonoBehaviour
             float touchX = delta.x * mouseSensitivity * 0.02f * Time.deltaTime;
             float touchY = delta.y * mouseSensitivity * 0.02f * Time.deltaTime;
 
-            yawOffset += touchX;
-            pitch -= touchY;
+            rotateLeftRight += touchX;
+            lookUpDown -= touchY;
         }
     }
 #endif
 
-        pitch = Mathf.Clamp(pitch, minTilt, maxTilt);
+        lookUpDown = Mathf.Clamp(lookUpDown, minTilt, maxTilt);
 
-        cameraPivot.localRotation = Quaternion.Euler(pitch, yawOffset, 0f);
+        cameraPivot.localRotation = Quaternion.Euler(lookUpDown, rotateLeftRight, 0f);
     }
 
     void HandleLockedLook()
@@ -96,9 +96,9 @@ public class DroneCameraLook : MonoBehaviour
         cameraPivot.rotation = Quaternion.Euler(euler);
 
         // Sync values so unlocking feels smooth
-        pitch = euler.x;
-        if (pitch > 180f) pitch -= 360f;
+        lookUpDown = euler.x;
+        if (lookUpDown > 180f) lookUpDown  -= 360f;
 
-        yawOffset = euler.y;
+        rotateLeftRight = euler.y;
     }
 }

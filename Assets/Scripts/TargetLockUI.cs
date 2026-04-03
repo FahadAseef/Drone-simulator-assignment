@@ -2,18 +2,24 @@ using UnityEngine;
 
 public class TargetLockUI : MonoBehaviour
 {
+    [Header("UI Refference")]
     public TargetDetector targetDetector;
-    public GameObject lockStatusText;
+    public GameObject lockStatusImg;
 
     void Update()
     {
         if (targetDetector.lockedTarget != null)
         {
-            lockStatusText.SetActive(true);
+            lockStatusImg.SetActive(true);
         }
         else
         {
-            lockStatusText.SetActive(false);
+            lockStatusImg.SetActive(false);
         }
+    }
+
+    public void Quit()
+    {
+        Application.Quit();
     }
 }

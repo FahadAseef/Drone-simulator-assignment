@@ -7,8 +7,8 @@ public class Missile : MonoBehaviour
     public float rotateSpeed = 5f;
     public float hitDistance = 2f;
 
-    [Header("Homing")]
-    public float closeRange = 10f;          // When missile gets close
+    [Header("Missile Homing")]
+    public float closeRange = 10f;
     public float closeTurnMultiplier = 2.5f;
     public float closeSpeedMultiplier = 0.7f;
 
@@ -54,7 +54,6 @@ public class Missile : MonoBehaviour
         // Move forward only
         transform.position += transform.forward * currentSpeed * Time.deltaTime;
 
-        // Proximity hit
         if (distance <= hitDistance)
         {
             HitTarget(target);
@@ -76,7 +75,7 @@ public class Missile : MonoBehaviour
         if (hasHit) return;
         hasHit = true;
 
-        Debug.Log("MISSILE HIT: " + hitTarget.name);
+        //Debug.Log("MISSILE HIT: " + hitTarget.name);
 
         if (explosionPrefab != null)
         {
